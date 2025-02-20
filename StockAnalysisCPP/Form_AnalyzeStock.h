@@ -114,6 +114,11 @@ namespace CppCLRWinFormsProject {
 	/// <param name="sender"></param>
 	/// <param name="e"></param>
 	private: System::Void dateTimePicker_endDate_ValueChanged(System::Object^ sender, System::EventArgs^ e);
+
+	/// <summary>
+	/// Calls functions to filter candlesticks, reset, and update the chart and DataGridView
+	/// </summary>
+	private: System::Void displayStockData();
 #pragma endregion
 
 #pragma region Windows Form Designer generated code

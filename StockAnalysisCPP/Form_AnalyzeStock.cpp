@@ -27,14 +27,9 @@ Void Form_AnalyzeStock::openFileDialog_loadTicker_FileOk(System::Object^ sender,
 
     // Read the candlestick data from the selected file
     readCandlesticksFromFile();
-    // Filter the candlesticks based on the user-selected date range
-    filterCandlesticks();
-    // Normalize the y-axis of the chart to fit the candlesticks data
-    normalizeChart();
-    // Display the candlestick data in the chart
-    displayChart();
-    // Display the candlestick data in the DataGridView
-    displayDataGridView();
+
+    // Display stock data based on the user-selected date range
+    displayStockData();
 }
 
 /// <summary>
@@ -109,13 +104,6 @@ Void Form_AnalyzeStock::filterCandlesticks()
 /// </summary>
 Void Form_AnalyzeStock::normalizeChart()
 {
-    // Check if there are no candlesticks within the date range to display
-    if (filteredCandlesticks->Count == 0)
-    {
-        // Exit function
-        return;
-    }
-
     // Find the minimum low price in the filtered candlesticks
     double minLow = Double::MaxValue;
     // Find the maximum high price in the filtered candlesticks
@@ -146,10 +134,6 @@ Void Form_AnalyzeStock::normalizeChart()
 /// </summary>
 Void Form_AnalyzeStock::displayChart()
 {
-    // Clear existing data in the chart
-    chart_stockData->Series["Series_OHLC"]->Points->Clear();
-    chart_stockData->Series["Series_Volume"]->Points->Clear();
-
     // Loop through each candlestick in the filtered list
     for each(Candlestick ^ candle in filteredCandlesticks)
     {
@@ -178,14 +162,8 @@ Void Form_AnalyzeStock::displayDataGridView()
 /// <param name="e"></param>
 Void Form_AnalyzeStock::dateTimePicker_startDate_ValueChanged(System::Object^ sender, System::EventArgs^ e)
 {
-    // Filter the candlesticks based on the user-selected date range
-    filterCandlesticks();
-    // Normalize the y-axis of the chart to fit the candlesticks data
-    normalizeChart();
-    // Display the candlestick data in the chart
-    displayChart();
-    // Display the candlestick data in the DataGridView
-    displayDataGridView();
+    // Display stock data based on the user-selected date range
+    displayStockData();
 }
 
 /// <summary>
@@ -195,12 +173,32 @@ Void Form_AnalyzeStock::dateTimePicker_startDate_ValueChanged(System::Object^ se
 /// <param name="e"></param>
 Void Form_AnalyzeStock::dateTimePicker_endDate_ValueChanged(System::Object^ sender, System::EventArgs^ e)
 {
+    // Display stock data based on the user-selected date range
+    displayStockData();
+}
+
+/// <summary>
+/// Calls functions to filter candlesticks, reset, and update the chart and DataGridView
+/// </summary>
+Void Form_AnalyzeStock::displayStockData() {
     // Filter the candlesticks based on the user-selected date range
     filterCandlesticks();
-    // Normalize the y-axis of the chart to fit the candlesticks data
-    normalizeChart();
-    // Display the candlestick data in the chart
-    displayChart();
-    // Display the candlestick data in the DataGridView
-    displayDataGridView();
+
+    // Clear existing data in the chart
+    chart_stockData->Series["Series_OHLC"]->Points->Clear();
+    chart_stockData->Series["Series_Volume"]->Points->Clear();
+
+    // Reset DataGridView data source
+    dataGridView_stockData->DataSource = nullptr;
+
+    // Check if there are candlesticks within the date range to display
+    if (filteredCandlesticks->Count > 0)
+    {
+        // Normalize the y-axis of the chart to fit the candlesticks data
+        normalizeChart();
+        // Display the candlestick data in the chart
+        displayChart();
+        // Display the candlestick data in the DataGridView
+        displayDataGridView();
+    }
 }
