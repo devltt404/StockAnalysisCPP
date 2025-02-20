@@ -213,6 +213,7 @@ namespace CppCLRWinFormsProject {
 			this->dataGridView_stockData->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->dataGridView_stockData->Location = System::Drawing::Point(514, 22);
 			this->dataGridView_stockData->Name = L"dataGridView_stockData";
+			this->dataGridView_stockData->ReadOnly = true;
 			this->dataGridView_stockData->RowHeadersWidth = 62;
 			this->dataGridView_stockData->RowTemplate->Height = 28;
 			this->dataGridView_stockData->Size = System::Drawing::Size(1012, 231);
