@@ -184,8 +184,9 @@ Void Form_AnalyzeStock::displayStockData() {
     // Filter the candlesticks based on the user-selected date range
     filterCandlesticks();
 
-    // Clear existing data in the chart
+    // Clear existing OHLC data in the chart
     chart_stockData->Series["Series_OHLC"]->Points->Clear();
+    // Clear existing Volume data in the chart
     chart_stockData->Series["Series_Volume"]->Points->Clear();
 
     // Reset DataGridView data source
