@@ -134,16 +134,10 @@ Void Form_AnalyzeStock::normalizeChart()
 /// </summary>
 Void Form_AnalyzeStock::displayChart()
 {
-    // Loop through each candlestick in the filtered list
-    for each(Candlestick ^ candle in filteredCandlesticks)
-    {
-        // Add a data point to the "Series_OHLC" series (X: date, Y: high, low, open, close)
-        int pointIdx = chart_stockData->Series["Series_OHLC"]->Points->AddXY(
-            candle->date, candle->high, candle->low, candle->open, candle->close);
-
-        // Add a data point to the "Series_Volume" series (X: date, Y: volume)
-        chart_stockData->Series["Series_Volume"]->Points->AddXY(candle->date, candle->volume);
-    }
+    // Set the data source of the chart to the filtered candlesticks list
+    chart_stockData->DataSource = filteredCandlesticks;
+    // Bind the data to the chart
+    chart_stockData->DataBind();
 }
 
 /// <summary>
