@@ -64,15 +64,15 @@ namespace CppCLRWinFormsProject {
 	/// <summary>
 	/// Function to handle the click event of the button_loadTicker
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
 	private: System::Void button_loadTicker_Click(System::Object^ sender, System::EventArgs^ e);
 
 	/// <summary>
 	/// Function to handle the event after user selects a ticker file in the OpenFileDialog
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
 	private: System::Void openFileDialog_loadTicker_FileOk(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e);
 
 	/// <summary>
@@ -104,15 +104,15 @@ namespace CppCLRWinFormsProject {
 	/// <summary>
 	/// Function to handle the event when the user selects a date in the start date picker
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
 	private: System::Void dateTimePicker_startDate_ValueChanged(System::Object^ sender, System::EventArgs^ e);
 
 	/// <summary>
 	/// Function to handle the event when the user selects a date in the end date picker
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
 	private: System::Void dateTimePicker_endDate_ValueChanged(System::Object^ sender, System::EventArgs^ e);
 
 	/// <summary>

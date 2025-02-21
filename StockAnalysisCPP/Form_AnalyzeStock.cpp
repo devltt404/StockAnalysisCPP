@@ -9,8 +9,8 @@ using namespace System::Windows::Forms;
 /// <summary>
 /// Function to handle the click event of the button_loadTicker
 /// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
 Void Form_AnalyzeStock::button_loadTicker_Click(System::Object^ sender, System::EventArgs^ e) {
 	// Display the OpenFileDialog to allow the user to select a ticker file
 	openFileDialog_loadTicker->ShowDialog();
@@ -19,8 +19,8 @@ Void Form_AnalyzeStock::button_loadTicker_Click(System::Object^ sender, System::
 /// <summary>
 /// Function to handle the event after user selects a ticker file in the OpenFileDialog
 /// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
 Void Form_AnalyzeStock::openFileDialog_loadTicker_FileOk(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
 	// Set the title of the form to the name of the selected file
 	Text = Path::GetFileNameWithoutExtension(openFileDialog_loadTicker->FileName);
@@ -152,8 +152,8 @@ Void Form_AnalyzeStock::displayDataGridView()
 /// <summary>
 /// Function to handle the event when the user selects a date in the start date picker
 /// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
 Void Form_AnalyzeStock::dateTimePicker_startDate_ValueChanged(System::Object^ sender, System::EventArgs^ e)
 {
     // Display stock data based on the user-selected date range
@@ -163,8 +163,8 @@ Void Form_AnalyzeStock::dateTimePicker_startDate_ValueChanged(System::Object^ se
 /// <summary>
 /// Function to handle the event when the user selects a date in the end date picker
 /// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
 Void Form_AnalyzeStock::dateTimePicker_endDate_ValueChanged(System::Object^ sender, System::EventArgs^ e)
 {
     // Display stock data based on the user-selected date range
