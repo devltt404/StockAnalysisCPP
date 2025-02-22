@@ -91,10 +91,18 @@ Void Form_AnalyzeStock::filterCandlesticks()
     // Iterate through candlesticks and filter based on the date range
     for each(Candlestick ^ c in candlesticks)
     {
+		// Check if the candlestick date is within the user-selected date range
         if (c->date >= startDate && c->date <= endDate)
         {
+			// Add the candlestick to the filtered list
             filteredCandlesticks->Add(c);
         }
+    }
+
+	// Check if the first candlestick date is greater than the second candlestick date
+    if (filteredCandlesticks[0]->date > filteredCandlesticks[1]->date) {
+		// Reverse the order of the filtered candlesticks
+		filteredCandlesticks->Reverse();
     }
 }
 
