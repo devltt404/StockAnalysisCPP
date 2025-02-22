@@ -1,6 +1,7 @@
 #pragma once
 using namespace System;
 
+// Candlestick class to store the OHLCV data for a stock on a particular day
 public ref class Candlestick
 {
 public:	
