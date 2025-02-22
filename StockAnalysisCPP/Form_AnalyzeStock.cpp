@@ -67,7 +67,16 @@ Void Form_AnalyzeStock::readCandlesticksFromFile()
 
         // Close the StreamReader
         sr->Close();
+
+
+        // Check if there are at least two candlesticks in the list 
+        // and the first candlestick date is greater than the second candlestick date
+        if (candlesticks->Count >= 2 && candlesticks[0]->date > candlesticks[1]->date) {
+            // Reverse the order of the candlesticks
+            candlesticks->Reverse();
+        }
     }
+	// Catch any exceptions that occur when reading the file
     catch (Exception^ ex)
     {
         // Show an error message if an exception occurs
@@ -97,12 +106,6 @@ Void Form_AnalyzeStock::filterCandlesticks()
 			// Add the candlestick to the filtered list
             filteredCandlesticks->Add(c);
         }
-    }
-
-	// Check if the first candlestick date is greater than the second candlestick date
-    if (filteredCandlesticks[0]->date > filteredCandlesticks[1]->date) {
-		// Reverse the order of the filtered candlesticks
-		filteredCandlesticks->Reverse();
     }
 }
 
