@@ -46,6 +46,7 @@ Void Form_AnalyzeStock::readCandlesticksFromFile()
     // Open the file to read its contents
     try
     {
+		// Create a new StreamReader to read the file
         StreamReader^ sr = gcnew StreamReader(fileName);
 
         // Read the first line of the file
@@ -123,9 +124,13 @@ Void Form_AnalyzeStock::normalizeChart()
     // Iterate through filtered candlesticks to determine min and max values
     for each(Candlestick ^ c in filteredCandlesticks)
     {
+		// If the low price of the candlestick is less than the current minimum low price
         if (c->low < minLow)
+			// Set the minimum low price to the low price of the candlestick
             minLow = c->low;
+		// If the high price of the candlestick is greater than the current maximum high price
         if (c->high > maxHigh)
+			// Set the maximum high price to the high price of the candlestick
             maxHigh = c->high;
     }
 
