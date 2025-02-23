@@ -151,9 +151,10 @@ namespace CppCLRWinFormsProject {
 			this->button_loadTicker->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->button_loadTicker->ForeColor = System::Drawing::Color::White;
-			this->button_loadTicker->Location = System::Drawing::Point(51, 22);
+			this->button_loadTicker->Location = System::Drawing::Point(34, 14);
+			this->button_loadTicker->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
 			this->button_loadTicker->Name = L"button_loadTicker";
-			this->button_loadTicker->Size = System::Drawing::Size(202, 69);
+			this->button_loadTicker->Size = System::Drawing::Size(135, 45);
 			this->button_loadTicker->TabIndex = 0;
 			this->button_loadTicker->Text = L"Load Ticker";
 			this->button_loadTicker->UseVisualStyleBackColor = false;
@@ -173,9 +174,10 @@ namespace CppCLRWinFormsProject {
 			this->label_endDate->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label_endDate->ForeColor = System::Drawing::Color::Black;
-			this->label_endDate->Location = System::Drawing::Point(46, 171);
+			this->label_endDate->Location = System::Drawing::Point(31, 111);
+			this->label_endDate->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
 			this->label_endDate->Name = L"label_endDate";
-			this->label_endDate->Size = System::Drawing::Size(85, 22);
+			this->label_endDate->Size = System::Drawing::Size(58, 15);
 			this->label_endDate->TabIndex = 8;
 			this->label_endDate->Text = L"End Date";
 			// 
@@ -185,25 +187,28 @@ namespace CppCLRWinFormsProject {
 			this->label_startDate->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label_startDate->ForeColor = System::Drawing::Color::Black;
-			this->label_startDate->Location = System::Drawing::Point(46, 122);
+			this->label_startDate->Location = System::Drawing::Point(31, 79);
+			this->label_startDate->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
 			this->label_startDate->Name = L"label_startDate";
-			this->label_startDate->Size = System::Drawing::Size(91, 22);
+			this->label_startDate->Size = System::Drawing::Size(61, 15);
 			this->label_startDate->TabIndex = 7;
 			this->label_startDate->Text = L"Start Date";
 			// 
 			// dateTimePicker_endDate
 			// 
-			this->dateTimePicker_endDate->Location = System::Drawing::Point(144, 169);
+			this->dateTimePicker_endDate->Location = System::Drawing::Point(96, 110);
+			this->dateTimePicker_endDate->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
 			this->dateTimePicker_endDate->Name = L"dateTimePicker_endDate";
-			this->dateTimePicker_endDate->Size = System::Drawing::Size(272, 26);
+			this->dateTimePicker_endDate->Size = System::Drawing::Size(183, 20);
 			this->dateTimePicker_endDate->TabIndex = 6;
 			this->dateTimePicker_endDate->ValueChanged += gcnew System::EventHandler(this, &Form_AnalyzeStock::dateTimePicker_endDate_ValueChanged);
 			// 
 			// dateTimePicker_startDate
 			// 
-			this->dateTimePicker_startDate->Location = System::Drawing::Point(144, 118);
+			this->dateTimePicker_startDate->Location = System::Drawing::Point(96, 77);
+			this->dateTimePicker_startDate->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
 			this->dateTimePicker_startDate->Name = L"dateTimePicker_startDate";
-			this->dateTimePicker_startDate->Size = System::Drawing::Size(272, 26);
+			this->dateTimePicker_startDate->Size = System::Drawing::Size(183, 20);
 			this->dateTimePicker_startDate->TabIndex = 5;
 			this->dateTimePicker_startDate->Value = System::DateTime(2024, 1, 1, 0, 0, 0, 0);
 			this->dateTimePicker_startDate->ValueChanged += gcnew System::EventHandler(this, &Form_AnalyzeStock::dateTimePicker_startDate_ValueChanged);
@@ -211,12 +216,13 @@ namespace CppCLRWinFormsProject {
 			// dataGridView_stockData
 			// 
 			this->dataGridView_stockData->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->dataGridView_stockData->Location = System::Drawing::Point(514, 22);
+			this->dataGridView_stockData->Location = System::Drawing::Point(343, 14);
+			this->dataGridView_stockData->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
 			this->dataGridView_stockData->Name = L"dataGridView_stockData";
 			this->dataGridView_stockData->ReadOnly = true;
 			this->dataGridView_stockData->RowHeadersWidth = 62;
 			this->dataGridView_stockData->RowTemplate->Height = 28;
-			this->dataGridView_stockData->Size = System::Drawing::Size(1012, 231);
+			this->dataGridView_stockData->Size = System::Drawing::Size(675, 150);
 			this->dataGridView_stockData->TabIndex = 9;
 			// 
 			// chart_stockData
@@ -228,8 +234,7 @@ namespace CppCLRWinFormsProject {
 			this->chart_stockData->ChartAreas->Add(chartArea2);
 			legend1->Name = L"Legend1";
 			this->chart_stockData->Legends->Add(legend1);
-			this->chart_stockData->Location = System::Drawing::Point(44, 292);
-			this->chart_stockData->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
+			this->chart_stockData->Location = System::Drawing::Point(29, 190);
 			this->chart_stockData->Name = L"chart_stockData";
 			series1->ChartArea = L"ChartArea_OHLC";
 			series1->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Candlestick;
@@ -240,7 +245,6 @@ namespace CppCLRWinFormsProject {
 			series1->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
 			series1->YValueMembers = L"High,Low,Open,Close";
 			series1->YValuesPerPoint = 4;
-			series1->YValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::UInt64;
 			series2->ChartArea = L"ChartArea_Volume";
 			series2->Legend = L"Legend1";
 			series2->Name = L"Series_Volume";
@@ -250,15 +254,15 @@ namespace CppCLRWinFormsProject {
 			series2->YValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::UInt64;
 			this->chart_stockData->Series->Add(series1);
 			this->chart_stockData->Series->Add(series2);
-			this->chart_stockData->Size = System::Drawing::Size(1482, 400);
+			this->chart_stockData->Size = System::Drawing::Size(988, 260);
 			this->chart_stockData->TabIndex = 10;
 			this->chart_stockData->Text = L"chart1";
 			// 
 			// Form_AnalyzeStock
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(9, 20);
+			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1544, 731);
+			this->ClientSize = System::Drawing::Size(1029, 475);
 			this->Controls->Add(this->chart_stockData);
 			this->Controls->Add(this->dataGridView_stockData);
 			this->Controls->Add(this->label_endDate);
@@ -266,6 +270,7 @@ namespace CppCLRWinFormsProject {
 			this->Controls->Add(this->dateTimePicker_endDate);
 			this->Controls->Add(this->dateTimePicker_startDate);
 			this->Controls->Add(this->button_loadTicker);
+			this->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
 			this->Name = L"Form_AnalyzeStock";
 			this->Text = L"Form_AnalyzeStock";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView_stockData))->EndInit();
