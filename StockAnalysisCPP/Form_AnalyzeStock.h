@@ -152,7 +152,7 @@ namespace CppCLRWinFormsProject {
 				static_cast<System::Byte>(0)));
 			this->button_loadTicker->ForeColor = System::Drawing::Color::White;
 			this->button_loadTicker->Location = System::Drawing::Point(34, 14);
-			this->button_loadTicker->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
+			this->button_loadTicker->Margin = System::Windows::Forms::Padding(2);
 			this->button_loadTicker->Name = L"button_loadTicker";
 			this->button_loadTicker->Size = System::Drawing::Size(135, 45);
 			this->button_loadTicker->TabIndex = 0;
@@ -197,7 +197,7 @@ namespace CppCLRWinFormsProject {
 			// dateTimePicker_endDate
 			// 
 			this->dateTimePicker_endDate->Location = System::Drawing::Point(96, 110);
-			this->dateTimePicker_endDate->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
+			this->dateTimePicker_endDate->Margin = System::Windows::Forms::Padding(2);
 			this->dateTimePicker_endDate->Name = L"dateTimePicker_endDate";
 			this->dateTimePicker_endDate->Size = System::Drawing::Size(183, 20);
 			this->dateTimePicker_endDate->TabIndex = 6;
@@ -206,7 +206,7 @@ namespace CppCLRWinFormsProject {
 			// dateTimePicker_startDate
 			// 
 			this->dateTimePicker_startDate->Location = System::Drawing::Point(96, 77);
-			this->dateTimePicker_startDate->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
+			this->dateTimePicker_startDate->Margin = System::Windows::Forms::Padding(2);
 			this->dateTimePicker_startDate->Name = L"dateTimePicker_startDate";
 			this->dateTimePicker_startDate->Size = System::Drawing::Size(183, 20);
 			this->dateTimePicker_startDate->TabIndex = 5;
@@ -217,7 +217,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			this->dataGridView_stockData->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->dataGridView_stockData->Location = System::Drawing::Point(343, 14);
-			this->dataGridView_stockData->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
+			this->dataGridView_stockData->Margin = System::Windows::Forms::Padding(2);
 			this->dataGridView_stockData->Name = L"dataGridView_stockData";
 			this->dataGridView_stockData->ReadOnly = true;
 			this->dataGridView_stockData->RowHeadersWidth = 62;
@@ -243,7 +243,7 @@ namespace CppCLRWinFormsProject {
 			series1->Name = L"Series_OHLC";
 			series1->XValueMember = L"Date";
 			series1->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
-			series1->YValueMembers = L"High,Low,Open,Close";
+			series1->YValueMembers = L"high,low,open,close";
 			series1->YValuesPerPoint = 4;
 			series2->ChartArea = L"ChartArea_Volume";
 			series2->Legend = L"Legend1";
@@ -270,7 +270,7 @@ namespace CppCLRWinFormsProject {
 			this->Controls->Add(this->dateTimePicker_endDate);
 			this->Controls->Add(this->dateTimePicker_startDate);
 			this->Controls->Add(this->button_loadTicker);
-			this->Margin = System::Windows::Forms::Padding(2, 2, 2, 2);
+			this->Margin = System::Windows::Forms::Padding(2);
 			this->Name = L"Form_AnalyzeStock";
 			this->Text = L"Form_AnalyzeStock";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView_stockData))->EndInit();
