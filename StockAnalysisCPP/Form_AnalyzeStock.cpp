@@ -157,15 +157,6 @@ Void Form_AnalyzeStock::displayChart()
 }
 
 /// <summary>
-/// Function to display the stock data (OHLCV) in a DataGridView
-/// </summary>
-Void Form_AnalyzeStock::displayDataGridView()
-{
-    // Set the data source of the DataGridView to the filtered candlesticks list
-    dataGridView_stockData->DataSource = filteredCandlesticks;
-}
-
-/// <summary>
 /// Function to handle the event when the user selects a date in the start date picker
 /// </summary>
 /// <param name="sender">The control that triggered the event</param>
@@ -188,7 +179,7 @@ Void Form_AnalyzeStock::dateTimePicker_endDate_ValueChanged(System::Object^ send
 }
 
 /// <summary>
-/// Calls functions to filter candlesticks, reset, and update the chart and DataGridView
+/// Calls functions to filter candlesticks, reset, and update the chart
 /// </summary>
 Void Form_AnalyzeStock::displayStockData() {
     // Filter the candlesticks based on the user-selected date range
@@ -199,9 +190,6 @@ Void Form_AnalyzeStock::displayStockData() {
     // Clear existing Volume data in the chart
     chart_stockData->Series["Series_Volume"]->Points->Clear();
 
-    // Reset DataGridView data source
-    dataGridView_stockData->DataSource = nullptr;
-
     // Check if there are candlesticks within the date range to display
     if (filteredCandlesticks->Count > 0)
     {
@@ -209,7 +197,5 @@ Void Form_AnalyzeStock::displayStockData() {
         normalizeChart();
         // Display the candlestick data in the chart
         displayChart();
-        // Display the candlestick data in the DataGridView
-        displayDataGridView();
     }
 }
