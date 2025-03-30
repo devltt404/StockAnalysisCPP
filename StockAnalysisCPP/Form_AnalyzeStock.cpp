@@ -79,6 +79,16 @@ Void Form_AnalyzeStock::openFileDialog_loadTicker_FileOk(System::Object^ sender,
     }
 }
 
+/// <summary>
+/// Function to compare two candlesticks by date
+/// </summary>
+/// <param name="a">First candlestick</param>
+/// <param name="b">Second candlestick</param>
+/// <returns>Returns an integer value indicating the comparison result</returns>
+int compareCandlesticks(Candlestick^ a, Candlestick^ b) {
+    return a->date.CompareTo(b->date);
+}
+
 
 /// <summary>  
 /// Function to read candlestick data from the selected file and store it in a list  
@@ -115,13 +125,8 @@ Void Form_AnalyzeStock::readCandlesticksFromFile(String^ fileName)
         // Close the StreamReader
         sr->Close();
 
-
-        // Check if there are at least two candlesticks in the list 
-        // and the first candlestick date is greater than the second candlestick date
-        if (candlesticks->Count >= 2 && candlesticks[0]->date > candlesticks[1]->date) {
-            // Reverse the order of the candlesticks
-            candlesticks->Reverse();
-        }
+		// Sort the candlesticks list by date in ascending order
+        candlesticks->Sort(gcnew Comparison<Candlestick^>(compareCandlesticks));
     }
 	// Catch any exceptions that occur when reading the file
     catch (Exception^ ex)
