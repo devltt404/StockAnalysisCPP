@@ -62,6 +62,10 @@ Void Form_AnalyzeStock::openFileDialog_loadTicker_FileOk(System::Object^ sender,
         if (i == 0) {
             // Use the current form to display and analyze stock data of the first file  
             analyzeStockForm = this;
+            // Set the selected downwave to empty
+            comboBox_downWave->Text = "";
+            // Set the selected upwave to empty
+            comboBox_upWave->Text = "";
             // Read the candlestick data from the selected file  
             readCandlesticksFromFile(fileName);
             // Display the stock data based on the user-selected date range  
