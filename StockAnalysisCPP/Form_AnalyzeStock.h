@@ -27,12 +27,13 @@ namespace CppCLRWinFormsProject {
 
 	/// <summary>  
 	/// Constructor to create a new instance of the Form_AnalyzeStock class  
-	/// with specified ticker file name, start date, and end date  
+	/// with specified ticker file name, start date, end date, and margin
 	/// </summary>  
 	/// <param name="tickerFileName">The ticker filename</param>  
 	/// <param name="start">The start date for candlesticks filtering</param>  
 	/// <param name="end">The end date for candlesticks filtering</param>  
-	public: Form_AnalyzeStock(String^ tickerFileName, DateTime start, DateTime end) {
+	/// <param name="margin">The margin for peak and valley detection</param>
+	public: Form_AnalyzeStock(String^ tickerFileName, DateTime start, DateTime end, int margin) {
 		// Initialize the form components and data members  
 		intializeForm();
 
@@ -40,6 +41,8 @@ namespace CppCLRWinFormsProject {
 		dateTimePicker_startDate->Value = start;
 		// Set the end date picker value to the specified end date  
 		dateTimePicker_endDate->Value = end;
+		// Set the trackBar_peakValleyMargin value to the specified margin
+		trackBar_peakValleyMargin->Value = margin;
 
 		// Read the candlestick data from the selected file  
 		readCandlesticksFromFile(tickerFileName);

@@ -69,7 +69,7 @@ Void Form_AnalyzeStock::openFileDialog_loadTicker_FileOk(System::Object^ sender,
         }
         else {
             // Create a new form to display and analyze stock data of the subsequent files
-            analyzeStockForm = gcnew Form_AnalyzeStock(fileName, startDate, endDate);
+            analyzeStockForm = gcnew Form_AnalyzeStock(fileName, startDate, endDate, trackBar_peakValleyMargin->Value);
         }
 
         // Set the title of the form to the ticker name  
@@ -368,6 +368,10 @@ Void Form_AnalyzeStock::detectWaves() {
 			Wave^ tempWave = gcnew Wave(prevExtreme->date, nextExtreme->date, prevExtreme->price, nextExtreme->price);
             // Create a label for the wave  
             String^ waveLabel = tempWave->startDate.ToString("MM/dd/yyyy") + " - " + tempWave->endDate.ToString("MM/dd/yyyy");
+
+            // Check if 2 extremes have same date, then skip to next iteration
+            if (prevExtreme->date == nextExtreme->date) continue;
+
             // Check if the wave is a down wave  
             if (prevExtreme->isPeak && !nextExtreme->isPeak && prevExtreme->price > nextExtreme->price) {
                 // Add the wave to the downWaves list  
