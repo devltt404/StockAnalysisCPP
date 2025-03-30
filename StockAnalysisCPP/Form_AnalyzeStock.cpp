@@ -90,6 +90,7 @@ Void Form_AnalyzeStock::openFileDialog_loadTicker_FileOk(System::Object^ sender,
 /// <param name="b">Second candlestick</param>
 /// <returns>Returns an integer value indicating the comparison result</returns>
 int compareCandlesticks(Candlestick^ a, Candlestick^ b) {
+	// Compare the dates of the candlesticks
     return a->date.CompareTo(b->date);
 }
 
