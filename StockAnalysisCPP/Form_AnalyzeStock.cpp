@@ -315,14 +315,14 @@ Void Form_AnalyzeStock::detectPeakAndValley() {
         // If the current candlestick is a peak  
         if (isPeak) {
             // Add the peak to the extremes list  
-			extremes->Add(gcnew Extreme(currentCandlestick->date, currentCandlestick->high, true));
+			extremes->Add(gcnew Extreme(currentCandlestick->date, currentCandlestick->high, true, i));
             // Add an arrow annotation to the chart indicating a peak  
             addPeakValleyAnnotation(i, true);
         }
         // If the current candlestick is a valley  
         if (isValley) {
             // Add the valley to the extremes list  
-			extremes->Add(gcnew Extreme(currentCandlestick->date, currentCandlestick->low, false));
+			extremes->Add(gcnew Extreme(currentCandlestick->date, currentCandlestick->low, false, i));
             // Add an arrow annotation to the chart indicating a valley  
             addPeakValleyAnnotation(i, false);
         }
@@ -375,7 +375,7 @@ Void Form_AnalyzeStock::detectWaves() {
             // Get the next extreme value  
             auto nextExtreme = extremes[j];
             // Create a new Wave object with the start and end dates and prices  
-			Wave^ tempWave = gcnew Wave(prevExtreme->date, nextExtreme->date, prevExtreme->price, nextExtreme->price);
+			Wave^ tempWave = gcnew Wave(prevExtreme->date, nextExtreme->date, prevExtreme->price, nextExtreme->price, prevExtreme->index, nextExtreme->index);
             // Create a label for the wave  
             String^ waveLabel = tempWave->startDate.ToString("MM/dd/yyyy") + " - " + tempWave->endDate.ToString("MM/dd/yyyy");
 
@@ -466,39 +466,22 @@ Void Form_AnalyzeStock::addWaveAnnotation(Wave^ wave, bool isUp)
         }
     }
 
-    // Initialize startPoint to nullptr
-    DataPoint^ startPoint = nullptr;
-    // Loop through each DataPoint in the "Series_OHLC" series
-    for each (DataPoint ^ p in chart_stockData->Series["Series_OHLC"]->Points)
-    {
-        // Check if the XValue of the DataPoint matches the startDate of the wave
-        if (p->XValue == wave->startDate.ToOADate())
-        {
-            // Assign the matching DataPoint to startPoint and break out of the loop
-            startPoint = p;
-            break;
-        }
-    }
-
-    // Initialize endPoint to nullptr
-    DataPoint^ endPoint = nullptr;
-    // Loop through each DataPoint in the "Series_OHLC" series
-    for each (DataPoint ^ p in chart_stockData->Series["Series_OHLC"]->Points)
-    {
-        // Check if the XValue of the DataPoint matches the endDate of the wave
-        if (p->XValue == wave->endDate.ToOADate())
-        {
-            // Assign the matching DataPoint to endPoint and break out of the loop
-            endPoint = p;
-            break;
-        }
-    }
-
-    // If the start or end point is not found, exit the function  
-    if (startPoint == nullptr || endPoint == nullptr) return;
-
     // Set the color of up wave to green and down wave to red  
     Color color = isUp ? Color::Green : Color::Red;
+
+    // Get the x axis of the chart
+    Axis^ axisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
+    // Get the y axis of the chart
+    Axis^ axisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
+    // Get the x position of the wave annotation
+    int x = wave->startIndex + 1;
+    // Get the width of the wave annotation
+    double width = axisX->ValueToPosition(wave->endIndex) - axisX->ValueToPosition(wave->startIndex);
+    // Get the height of the wave annotation
+    double height = axisY->ValueToPosition(wave->endPrice) - axisY->ValueToPosition(wave->startPrice);
+    // Get the y position of the wave annotation
+    double y = wave->startPrice;
+
 
     // Create rectangle annotation for the wave  
     RectangleAnnotation^ rect = gcnew RectangleAnnotation();
@@ -514,12 +497,17 @@ Void Form_AnalyzeStock::addWaveAnnotation(Wave^ wave, bool isUp)
     rect->LineWidth = 2;
     // Set the background color of the rectangle annotation  
     rect->BackColor = Color::FromArgb(35, color);
-    // Set the anchor of the rectangle annotation to the start and end points  
-    rect->SetAnchor(startPoint, endPoint);
-    // Set the anchor alignment of the rectangle annotation to top left  
-    rect->AnchorAlignment = ContentAlignment::TopLeft;
     // Enable annotation to overlap with other annotations  
     rect->SmartLabelStyle->Enabled = false;
+
+    // Set the X position of the rectangle annotation
+    rect->X = x;
+    // Set the width of the rectangle annotation
+    rect->Width = width;
+    // Set the height of the rectangle annotation
+    rect->Height = height;
+    // Set the Y position of the rectangle annotation
+    rect->Y = y;
 
     // Create diagonal line annotation  
     LineAnnotation^ line = gcnew LineAnnotation();
@@ -536,8 +524,14 @@ Void Form_AnalyzeStock::addWaveAnnotation(Wave^ wave, bool isUp)
     // Enable annotation to overlap with other annotations  
     line->SmartLabelStyle->Enabled = false;
 
-    // Set the anchor of the line annotation to the start and end points  
-    line->SetAnchor(startPoint, endPoint);
+    // Set the line x position
+    line->X = x;
+    // Set the line width
+    line->Width = width;
+    // Set the line height
+    line->Height = height;
+    // Set the line y position
+    line->Y = y;
 
     // Add rectangle annotation to the chart  
     chart_stockData->Annotations->Add(rect);
