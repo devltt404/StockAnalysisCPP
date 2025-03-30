@@ -19,8 +19,11 @@ public:
 	/// <param name="isPeak">Boolean value to check if extreme is peak or valley</param>
 	Extreme(DateTime date, double price, bool isPeak)
 	{
+		// Assign date to the extreme object
 		this->date = date;
+		// Assign price to the extreme object
 		this->price = price;
+		// Assign isPeak to the extreme object
 		this->isPeak = isPeak;
 	}
 };

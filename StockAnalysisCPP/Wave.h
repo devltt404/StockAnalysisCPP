@@ -23,9 +23,13 @@ public:
 	/// <param name="endPrice">Wave's end price</param>
 	Wave(DateTime startDate, DateTime endDate, double startPrice, double endPrice)
 	{
+		// Assign start date to the wave object
 		this->startDate = startDate;
+		// Assign end date to the wave object
 		this->endDate = endDate;
+		// Assign start price to the wave object
 		this->startPrice = startPrice;
+		// Assign end price to the wave object
 		this->endPrice = endPrice;
 	}
 };

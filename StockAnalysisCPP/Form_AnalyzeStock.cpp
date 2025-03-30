@@ -310,7 +310,7 @@ Void Form_AnalyzeStock::detectPeakAndValley() {
             addPeakValleyAnnotation(i, true);
         }
         // If the current candlestick is a valley  
-        else if (isValley) {
+        if (isValley) {
             // Add the valley to the extremes list  
 			extremes->Add(gcnew Extreme(currentCandlestick->date, currentCandlestick->low, false));
             // Add an arrow annotation to the chart indicating a valley  
@@ -392,6 +392,7 @@ Void Form_AnalyzeStock::detectWaves() {
 /// <param name="sender">The control that triggered the event</param>  
 /// <param name="e">Event data</param>  
 Void Form_AnalyzeStock::comboBox_upWave_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
+    // Check if the selected index is valid
     if (comboBox_upWave->SelectedIndex >= 0 && comboBox_upWave->SelectedIndex < upWaves->Count) {
         // Get the selected up wave  
         Wave^ selectedWave = upWaves[comboBox_upWave->SelectedIndex];
@@ -407,6 +408,7 @@ Void Form_AnalyzeStock::comboBox_upWave_SelectedIndexChanged(System::Object^ sen
 /// <param name="sender">The control that triggered the event</param>  
 /// <param name="e">Event data</param>  
 Void Form_AnalyzeStock::comboBox_downWave_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
+    // Check if the selected index is valid
     if (comboBox_downWave->SelectedIndex >= 0 && comboBox_downWave->SelectedIndex < downWaves->Count) {
         // Get the selected down wave  
         Wave^ selectedWave = downWaves[comboBox_downWave->SelectedIndex];
