@@ -78,13 +78,14 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::TrackBar^ trackBar_peakValleyMargin;
 
 	private: System::Windows::Forms::DataVisualization::Charting::Chart^ chart_stockData;
+	private: System::ComponentModel::IContainer^ components;
 
 
 	private:
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container^ components;
+
 
 #pragma region Developer Code
 	// Declare a list to store Candlestick objects
@@ -113,6 +114,24 @@ namespace CppCLRWinFormsProject {
 	private: bool isValidWaveSelected = false;
 	// Declare a variable to store the confirmation annotations
 	private: List<EllipseAnnotation^>^ confirmationAnnotations = nullptr;
+	// Declare a variable to check if the selected wave is up
+	private: bool isSelectUpWave = false;
+	// Declare an array of Fibonacci levels
+	private: array<double>^ fibonnaciLevels;
+
+	// Declare a variable to store boolean value indicating if the simulation is running
+	private: bool isSimulating = false;
+	// Declare a variable to store the step size for the simulation
+	private: double stepSize;
+	// Declare a variable to store the current step count for the simulation
+	private: int currentStep = 0;
+private: System::Windows::Forms::Button^ button_minus;
+private: System::Windows::Forms::Button^ button_plus;
+private: System::Windows::Forms::Button^ button_simulate;
+private: System::Windows::Forms::Timer^ timer_simulate;
+	   // Declare a variable to store the number of steps for the simulation
+	private: int numberOfSteps = 30;
+
 
 
 	/// <summary>
@@ -206,12 +225,16 @@ namespace CppCLRWinFormsProject {
 	/// <param name="e">Event data</param>  
 	private: void comboBox_downWave_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e);
 
-	/// <summary>  
-	/// Function to add wave annotation to the chart  
-	/// </summary>  
-	/// <param name="wave">The selected wave object</param>  
-	/// <param name="isUp">Boolean value indicating if the wave is an up wave</param>  
-	private: void addWaveAnnotation(Wave^ wave, bool isUp);
+	/// <summary>
+	/// Function to handle the event when the user selects a wave from the comboBox_downWave
+	/// </summary>
+	/// <param name="selectedWave">The selected wave</param>
+	private: void handleSelectWave(Wave^ selectedWave);
+
+	/// <summary>
+	/// Function to annotate the confirmations in the chart
+	/// </summary>
+	private: void annotateConfirmations();
 
 	/// <summary>
 	/// Function to check if the selected wave of the rubber banding operation is valid
@@ -246,6 +269,40 @@ namespace CppCLRWinFormsProject {
 	/// <param name="sender">The control that triggered the event</param>
 	/// <param name="e">Event data</param>
 	private: System::Void chart_stockData_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e);
+
+
+	/// <summary>
+	/// Function to handle the click event of the button_simulate
+	/// </summary>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
+	private: System::Void button_simulate_Click(Object^ sender, EventArgs^ e);
+
+	/// <summary>
+	/// Function to handle the click event of the button_plus
+	/// </summary>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
+	private: System::Void button_plus_Click(Object^ sender, EventArgs^ e);
+
+	/// <summary>
+	/// Function to handle the click event of the button_minus
+	/// </summary>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
+	private: System::Void button_minus_Click(Object^ sender, EventArgs^ e);
+
+	/// <summary>
+	/// Function to handle the tick event of the timer_simulate
+	/// </summary>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
+	private: System::Void timer_simulate_Tick(Object^ sender, EventArgs^ e);
+
+	/// <summary>
+	/// Function to stop the simulation
+	/// </summary>
+	private: System::Void stopSimulation();
 #pragma endregion
 
 #pragma region Windows Form Designer generated code
@@ -255,10 +312,11 @@ namespace CppCLRWinFormsProject {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea2 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Series^ series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^ series2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			this->components = (gcnew System::ComponentModel::Container());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea7 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea8 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series7 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series8 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->button_loadTicker = (gcnew System::Windows::Forms::Button());
 			this->openFileDialog_loadTicker = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->label_endDate = (gcnew System::Windows::Forms::Label());
@@ -274,6 +332,10 @@ namespace CppCLRWinFormsProject {
 			this->label_peakValleyMargin = (gcnew System::Windows::Forms::Label());
 			this->trackBar_peakValleyMargin = (gcnew System::Windows::Forms::TrackBar());
 			this->label_confirmationsCount = (gcnew System::Windows::Forms::Label());
+			this->button_minus = (gcnew System::Windows::Forms::Button());
+			this->button_plus = (gcnew System::Windows::Forms::Button());
+			this->button_simulate = (gcnew System::Windows::Forms::Button());
+			this->timer_simulate = (gcnew System::Windows::Forms::Timer(this->components));
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart_stockData))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_peakValleyMargin))->BeginInit();
 			this->SuspendLayout();
@@ -295,7 +357,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			// openFileDialog_loadTicker
 			// 
-			this->openFileDialog_loadTicker->FileName = L"AAL-Day";
+			this->openFileDialog_loadTicker->FileName = L"ABBV-Day";
 			this->openFileDialog_loadTicker->Filter = L"All Files|*.csv|Monthly|*-Month.csv|Daily|*-Day.csv|Weekly|*-Week.csv";
 			this->openFileDialog_loadTicker->InitialDirectory = L"D:\\@DEVLTT404\\USF\\@@@Spring2025\\CIS4930_OOP\\StockAnalysisCPP\\Stock Data";
 			this->openFileDialog_loadTicker->Multiselect = true;
@@ -335,6 +397,7 @@ namespace CppCLRWinFormsProject {
 			this->dateTimePicker_endDate->Name = L"dateTimePicker_endDate";
 			this->dateTimePicker_endDate->Size = System::Drawing::Size(183, 20);
 			this->dateTimePicker_endDate->TabIndex = 6;
+			this->dateTimePicker_endDate->Value = System::DateTime(2021, 2, 28, 0, 0, 0, 0);
 			// 
 			// dateTimePicker_startDate
 			// 
@@ -343,35 +406,35 @@ namespace CppCLRWinFormsProject {
 			this->dateTimePicker_startDate->Name = L"dateTimePicker_startDate";
 			this->dateTimePicker_startDate->Size = System::Drawing::Size(183, 20);
 			this->dateTimePicker_startDate->TabIndex = 5;
-			this->dateTimePicker_startDate->Value = System::DateTime(2023, 1, 1, 0, 0, 0, 0);
+			this->dateTimePicker_startDate->Value = System::DateTime(2021, 2, 1, 0, 0, 0, 0);
 			// 
 			// chart_stockData
 			// 
-			chartArea1->AlignWithChartArea = L"ChartArea_Volume";
-			chartArea1->Name = L"ChartArea_OHLC";
-			chartArea2->Name = L"ChartArea_Volume";
-			this->chart_stockData->ChartAreas->Add(chartArea1);
-			this->chart_stockData->ChartAreas->Add(chartArea2);
+			chartArea7->AlignWithChartArea = L"ChartArea_Volume";
+			chartArea7->Name = L"ChartArea_OHLC";
+			chartArea8->Name = L"ChartArea_Volume";
+			this->chart_stockData->ChartAreas->Add(chartArea7);
+			this->chart_stockData->ChartAreas->Add(chartArea8);
 			this->chart_stockData->Location = System::Drawing::Point(29, 142);
 			this->chart_stockData->Name = L"chart_stockData";
-			series1->ChartArea = L"ChartArea_OHLC";
-			series1->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Candlestick;
-			series1->CustomProperties = L"PriceDownColor=Red, PriceUpColor=Green";
-			series1->IsXValueIndexed = true;
-			series1->Name = L"Series_OHLC";
-			series1->XValueMember = L"Date";
-			series1->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
-			series1->YValueMembers = L"high,low,open,close";
-			series1->YValuesPerPoint = 4;
-			series2->ChartArea = L"ChartArea_Volume";
-			series2->IsXValueIndexed = true;
-			series2->Name = L"Series_Volume";
-			series2->XValueMember = L"Date";
-			series2->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
-			series2->YValueMembers = L"Volume";
-			series2->YValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::UInt64;
-			this->chart_stockData->Series->Add(series1);
-			this->chart_stockData->Series->Add(series2);
+			series7->ChartArea = L"ChartArea_OHLC";
+			series7->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Candlestick;
+			series7->CustomProperties = L"PriceDownColor=Red, PriceUpColor=Green";
+			series7->IsXValueIndexed = true;
+			series7->Name = L"Series_OHLC";
+			series7->XValueMember = L"Date";
+			series7->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
+			series7->YValueMembers = L"high,low,open,close";
+			series7->YValuesPerPoint = 4;
+			series8->ChartArea = L"ChartArea_Volume";
+			series8->IsXValueIndexed = true;
+			series8->Name = L"Series_Volume";
+			series8->XValueMember = L"Date";
+			series8->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
+			series8->YValueMembers = L"Volume";
+			series8->YValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::UInt64;
+			this->chart_stockData->Series->Add(series7);
+			this->chart_stockData->Series->Add(series8);
 			this->chart_stockData->Size = System::Drawing::Size(1017, 486);
 			this->chart_stockData->TabIndex = 10;
 			this->chart_stockData->Text = L"chart1";
@@ -441,7 +504,7 @@ namespace CppCLRWinFormsProject {
 			this->label_peakValleyMargin->Name = L"label_peakValleyMargin";
 			this->label_peakValleyMargin->Size = System::Drawing::Size(112, 13);
 			this->label_peakValleyMargin->TabIndex = 14;
-			this->label_peakValleyMargin->Text = L"Peak/Valley Margin: 4";
+			this->label_peakValleyMargin->Text = L"Peak/Valley Margin: 1";
 			// 
 			// trackBar_peakValleyMargin
 			// 
@@ -451,7 +514,7 @@ namespace CppCLRWinFormsProject {
 			this->trackBar_peakValleyMargin->Name = L"trackBar_peakValleyMargin";
 			this->trackBar_peakValleyMargin->Size = System::Drawing::Size(141, 45);
 			this->trackBar_peakValleyMargin->TabIndex = 13;
-			this->trackBar_peakValleyMargin->Value = 4;
+			this->trackBar_peakValleyMargin->Value = 1;
 			this->trackBar_peakValleyMargin->ValueChanged += gcnew System::EventHandler(this, &Form_AnalyzeStock::trackBar_peakValleyMargin_ValueChanged);
 			// 
 			// label_confirmationsCount
@@ -466,11 +529,56 @@ namespace CppCLRWinFormsProject {
 			this->label_confirmationsCount->TabIndex = 20;
 			this->label_confirmationsCount->Text = L"Number of confirmations: 0";
 			// 
+			// button_minus
+			// 
+			this->button_minus->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14));
+			this->button_minus->Location = System::Drawing::Point(1011, 58);
+			this->button_minus->Margin = System::Windows::Forms::Padding(2);
+			this->button_minus->Name = L"button_minus";
+			this->button_minus->Size = System::Drawing::Size(34, 34);
+			this->button_minus->TabIndex = 23;
+			this->button_minus->Text = L"-";
+			this->button_minus->UseVisualStyleBackColor = true;
+			this->button_minus->Click += gcnew System::EventHandler(this, &Form_AnalyzeStock::button_minus_Click);
+			// 
+			// button_plus
+			// 
+			this->button_plus->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14));
+			this->button_plus->Location = System::Drawing::Point(872, 58);
+			this->button_plus->Margin = System::Windows::Forms::Padding(2);
+			this->button_plus->Name = L"button_plus";
+			this->button_plus->Size = System::Drawing::Size(34, 34);
+			this->button_plus->TabIndex = 22;
+			this->button_plus->Text = L"+";
+			this->button_plus->UseVisualStyleBackColor = true;
+			this->button_plus->Click += gcnew System::EventHandler(this, &Form_AnalyzeStock::button_plus_Click);
+			// 
+			// button_simulate
+			// 
+			this->button_simulate->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 10));
+			this->button_simulate->Location = System::Drawing::Point(918, 58);
+			this->button_simulate->Margin = System::Windows::Forms::Padding(2);
+			this->button_simulate->Name = L"button_simulate";
+			this->button_simulate->Size = System::Drawing::Size(80, 34);
+			this->button_simulate->TabIndex = 21;
+			this->button_simulate->Text = L"Start";
+			this->button_simulate->UseVisualStyleBackColor = true;
+			this->button_simulate->Click += gcnew System::EventHandler(this, &Form_AnalyzeStock::button_simulate_Click);
+			// 
+			// timer_simulate
+			// 
+			this->timer_simulate->Enabled = true;
+			this->timer_simulate->Interval = 1000;
+			this->timer_simulate->Tick += gcnew System::EventHandler(this, &Form_AnalyzeStock::timer_simulate_Tick);
+			// 
 			// Form_AnalyzeStock
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1071, 641);
+			this->Controls->Add(this->button_minus);
+			this->Controls->Add(this->button_plus);
+			this->Controls->Add(this->button_simulate);
 			this->Controls->Add(this->label_confirmationsCount);
 			this->Controls->Add(this->comboBox_downWave);
 			this->Controls->Add(this->label_downWave);

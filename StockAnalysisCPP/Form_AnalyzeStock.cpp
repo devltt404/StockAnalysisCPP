@@ -27,6 +27,14 @@ Void Form_AnalyzeStock::intializeForm() {
 	downWaves = gcnew List<Wave^>();
 	// Initialize the confirmation annotations list
 	confirmationAnnotations = gcnew List<EllipseAnnotation^>();
+	// Clear the selected wave in the comboBox_downWave
+	comboBox_downWave->Text = "";
+	// Clear the selected wave in the comboBox_upWave
+	comboBox_upWave->Text = "";
+	// Reset the isValidWaveSelected flag to false
+	isValidWaveSelected = false;
+	// Initialize the Fibonacci levels array
+	fibonnaciLevels = gcnew array<double> { 0.0, 0.236, 0.382, 0.5, 0.618, 0.764, 1.0 };
 }
 
 /// <summary>
@@ -265,11 +273,13 @@ Void Form_AnalyzeStock::addPeakValleyAnnotation(int i, bool isPeak) {
 	arrow->Height = isPeak ? -10 : 10;
 	// Anchor the arrow to the specified DataPoint  
 	arrow->SetAnchor(dataPoint);
+	// Set the anchor offset y
+	arrow->AnchorOffsetY = -0.5;
 
 	// If the candlestick is a valley  
 	if (!isPeak) {
 		// Adjust the arrow Y position to the low price of the candlestick  
-		arrow->Y = (double)filteredCandlesticks[i]->low;
+		arrow->Y = (double)filteredCandlesticks[i]->low - 0.2;
 	}
 	// Add the arrow annotation to the chart  
 	chart_stockData->Annotations->Add(arrow);
@@ -351,12 +361,16 @@ Void Form_AnalyzeStock::trackBar_peakValleyMargin_ValueChanged(System::Object^ s
 Void Form_AnalyzeStock::button_refresh_Click(System::Object^ sender, System::EventArgs^ e) {
 	// Reset the isValidWaveSelected flag to false
 	isValidWaveSelected = false;
+	// Clear confirmation annotations
+	confirmationAnnotations->Clear();
 	// Display stock data based on the user-selected date range  
 	displayStockData();
 	// Clear the selected wave in the comboBox_downWave  
 	comboBox_downWave->Text = "";
 	// Clear the selected wave in the comboBox_upWave  
 	comboBox_upWave->Text = "";
+	// Stop simulation
+	stopSimulation();
 }
 
 /// <summary>  
@@ -416,8 +430,10 @@ Void Form_AnalyzeStock::comboBox_upWave_SelectedIndexChanged(System::Object^ sen
 		// Get the selected up wave  
 		Wave^ selectedWave = upWaves[comboBox_upWave->SelectedIndex];
 
-		// Draw the up wave  
-		addWaveAnnotation(selectedWave, true);
+		// Set the isSelectUpWave flag to true
+		isSelectUpWave = true;
+		// Handle the selected up wave
+		handleSelectWave(selectedWave);
 	}
 }
 
@@ -432,118 +448,48 @@ Void Form_AnalyzeStock::comboBox_downWave_SelectedIndexChanged(System::Object^ s
 		// Get the selected down wave  
 		Wave^ selectedWave = downWaves[comboBox_downWave->SelectedIndex];
 
-		// Draw the down wave  
-		addWaveAnnotation(selectedWave, false);
+		// Set the isSelectUpWave flag to false
+		isSelectUpWave = false;
+		// Handle the selected down wave
+		handleSelectWave(selectedWave);
 	}
 }
 
-/// <summary>  
-/// Function to add wave annotation to the chart  
-/// </summary>  
-/// <param name="wave">The selected wave object</param>  
-/// <param name="isUp">Boolean value indicating if the wave is an up wave</param>  
-Void Form_AnalyzeStock::addWaveAnnotation(Wave^ wave, bool isUp)
+/// <summary>
+/// Function to handle the event when the user selects a wave from the comboBox_downWave
+/// </summary>
+/// <param name="selectedWave">The selected wave</param>
+Void Form_AnalyzeStock::handleSelectWave(Wave^ selectedWave)
 {
-	// Get the existing annotations in the chart
-	auto annotations = gcnew List<Annotation^>(chart_stockData->Annotations);
-	// Clear existing wave annotations in the chart  
-	for each (Annotation ^ annotation in annotations)
-	{
-		// Check if wave is up  
-		if (isUp)
-		{
-			/// Check if the annotation is an up wave rectangle or line  
-			if (annotation->Name == "Up_Wave_Rectangle" || annotation->Name == "Up_Wave_Line")
-			{
-				// Remove the annotation from the chart  
-				chart_stockData->Annotations->Remove(annotation);
-			}
-		}
-		// Check if wave is down  
-		else
-		{
-			/// Check if the annotation is a down wave rectangle or line  
-			if (annotation->Name == "Down_Wave_Rectangle" || annotation->Name == "Down_Wave_Line")
-			{
-				// Remove the annotation from the chart  
-				chart_stockData->Annotations->Remove(annotation);
-			}
-		}
-	}
-
-	// Set the color of up wave to green and down wave to red  
-	Color color = isUp ? Color::Green : Color::Red;
-
 	// Get the x axis of the chart
-	Axis^ axisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
+	auto axisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
 	// Get the y axis of the chart
-	Axis^ axisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
-	// Get the x position of the wave annotation
-	int x = wave->startIndex + 1;
-	// Get the width of the wave annotation
-	double width = axisX->ValueToPosition(wave->endIndex) - axisX->ValueToPosition(wave->startIndex);
-	// Get the height of the wave annotation
-	double height = axisY->ValueToPosition(wave->endPrice) - axisY->ValueToPosition(wave->startPrice);
-	// Get the y position of the wave annotation
-	double y = wave->startPrice;
+	auto axisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
 
+	// Get the start index of the selected wave
+	startPointIdx = selectedWave->startIndex;
+	// Create a new point for the start point of the wave
+	startPoint = Point();
+	// Set the x position of the start point
+	startPoint.X = (int)axisX->ValueToPixelPosition(startPointIdx + 1);
+	// Set the y position of the start point
+	startPoint.Y = (int)axisY->ValueToPixelPosition((double)selectedWave->startPrice);
+	// Get the end index of the selected wave
+	endPointIdx = selectedWave->endIndex;
+	// Create a new point for the end point of the wave
+	currentPoint = Point();
+	// Set the x position of the end point
+	currentPoint.X = (int)axisX->ValueToPixelPosition(endPointIdx + 1);
+	// Set the y position of the end point
+	currentPoint.Y = (int)axisY->ValueToPixelPosition((double)selectedWave->endPrice);
+	// Set the isValidWaveSelected flag to true
+	isValidWaveSelected = true;
 
-	// Create rectangle annotation for the wave  
-	RectangleAnnotation^ rect = gcnew RectangleAnnotation();
-	// Set the name of the rectangle annotation  
-	rect->Name = isUp ? "Up_Wave_Rectangle" : "Down_Wave_Rectangle";
-	// Set the X axis of the rectangle annotation to the chart's X axis  
-	rect->AxisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
-	// Set the Y axis of the rectangle annotation to the chart's Y axis  
-	rect->AxisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
-	// Set the color of the rectangle annotation  
-	rect->LineColor = color;
-	// Set the width of the rectangle annotation  
-	rect->LineWidth = 2;
-	// Set the background color of the rectangle annotation  
-	rect->BackColor = Color::FromArgb(35, color);
-	// Enable annotation to overlap with other annotations  
-	rect->SmartLabelStyle->Enabled = false;
-
-	// Set the X position of the rectangle annotation
-	rect->X = x;
-	// Set the width of the rectangle annotation
-	rect->Width = width;
-	// Set the height of the rectangle annotation
-	rect->Height = height;
-	// Set the Y position of the rectangle annotation
-	rect->Y = y;
-
-	// Create diagonal line annotation  
-	LineAnnotation^ line = gcnew LineAnnotation();
-	// Set line name  
-	line->Name = isUp ? "Up_Wave_Line" : "Down_Wave_Line";
-	// Set line X axis to chart X axis  
-	line->AxisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
-	// Set line Y axis to chart Y axis  
-	line->AxisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
-	// Set line color  
-	line->LineColor = color;
-	// Set line width  
-	line->LineWidth = 2;
-	// Enable annotation to overlap with other annotations  
-	line->SmartLabelStyle->Enabled = false;
-
-	// Set the line x position
-	line->X = x;
-	// Set the line width
-	line->Width = width;
-	// Set the line height
-	line->Height = height;
-	// Set the line y position
-	line->Y = y;
-
-	// Add rectangle annotation to the chart  
-	chart_stockData->Annotations->Add(rect);
-	// Add line annotation to the chart  
-	chart_stockData->Annotations->Add(line);
-
-	// Refresh the chart  
+	// Set the step size for the simulation
+	stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * 0.4 / numberOfSteps;
+	// Annotate the confirmations
+	annotateConfirmations();
+	// Refresh the chart
 	chart_stockData->Invalidate();
 }
 
@@ -565,34 +511,40 @@ bool Form_AnalyzeStock::isValidWave()
 		// Return false if the indices are invalid
 		return false;
 	}
+	// If indices are valid
 	else
 	{
-		// Loop through the upWaves list to check if the wave exists
+		// Check if the selected wave is an up wave
 		for each (Wave ^ wave in upWaves)
 		{
-			// Check if the start and end index of the wave matches the selected candlestick indices
+			// Check if the start and end index of the wave match the selected candlestick indices
 			if (wave->startIndex == startCandlestickIdx && wave->endIndex == endCandlestickIdx)
 			{
-				// Return true if the wave exists
+				// Set the isSelectUpWave to true
+				isSelectUpWave = true;
+				// Return true
 				return true;
 			}
 		}
 
-		// Loop through the downWaves list to check if the wave exists
+		// Check if the selected wave is a down wave
 		for each (Wave ^ wave in downWaves)
 		{
-			// Check if the start and end index of the wave matches the selected candlestick indices
+			// Check if the start and end index of the wave match the selected indices
 			if (wave->startIndex == startCandlestickIdx && wave->endIndex == endCandlestickIdx)
 			{
-				// Return true if the wave exists
+				// Set the isSelectUpWave to false
+				isSelectUpWave = false;
+				// Return true
 				return true;
 			}
 		}
 
-		// Return false if the wave does not exist
+		// Return false if the selected wave is not valid
 		return false;
 	}
 }
+
 
 /// <summary>
 /// Function to handle the mouse down event on the chart
@@ -604,14 +556,35 @@ Void Form_AnalyzeStock::chart_stockData_MouseDown(Object^ sender, MouseEventArgs
 	// Declare a variable to store the hit test result of the mouse event
 	HitTestResult^ hit = chart_stockData->HitTest(e->X, e->Y);
 
+	// Declare a variable to indicate if the mouse is clicked on an extreme candlestick
+	bool isHitAnExtreme = false;
+	for each (Extreme ^ extreme in extremes)
+	{
+		if (extreme->index == hit->PointIndex)
+		{
+			isHitAnExtreme = true;
+			break;
+		}
+	}
+
+	// Reset the end point index of the rubber banding operation
+	endPointIdx = -1;
 	// Set the index of the start point of the rubber banding operation
 	startPointIdx = hit->PointIndex;
+	// Reset the boolean value to indicate if a valid wave is selected
+	isValidWaveSelected = false;
 	// Set the start point of the rubber banding operation
 	startPoint = e->Location;
 	// Set the isDragging to true
 	isDragging = true;
-	// Reset the boolean value to indicate if a valid wave is selected
-	isValidWaveSelected = false;
+	// Check if the clicked candlestick is not a peak or valley
+	if (!isHitAnExtreme)
+	{
+		// Set the isDragging to false
+		isDragging = false;
+		// Display an error message if the clicked candlestick is not a peak or valley
+		MessageBox::Show("You must select a peak or valley candlestick for the rubber-banding operation.");
+	}
 }
 
 /// <summary>
@@ -625,7 +598,11 @@ Void Form_AnalyzeStock::chart_stockData_MouseUp(Object^ sender, MouseEventArgs^ 
 	isDragging = false;
 
 	// Check if the selected wave is valid
-	isValidWaveSelected = isValidWave();
+	if (isValidWaveSelected)
+	{
+		// Set the step size for the simulation
+		stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * 0.4 / numberOfSteps;
+	}
 }
 
 /// <summary>
@@ -645,10 +622,107 @@ Void Form_AnalyzeStock::chart_stockData_MouseMove(Object^ sender, MouseEventArgs
 		currentPoint = e->Location;
 		// Set the end point index of the rubber banding operation
 		endPointIdx = hit->PointIndex;
+		// Check if the selected wave is valid
+		isValidWaveSelected = isValidWave();
+		// Annotate the confirmations in the chart
+		annotateConfirmations();
 		// Invalidate the chart to refresh the display
 		chart_stockData->Invalidate();
 	}
 }
+
+/// <summary>
+/// Function to annotate the confirmations in the chart
+/// </summary>
+Void Form_AnalyzeStock::annotateConfirmations()
+{
+	// Loop through the confirmation annotations list
+	for each (EllipseAnnotation ^ annotation in confirmationAnnotations)
+	{
+		// Remove the existing confirmation annotations from the chart
+		chart_stockData->Annotations->Remove(annotation);
+	}
+	// Clear the confirmation annotations list
+	confirmationAnnotations->Clear();
+	// Check if the selected rectangle is a valid wave
+	if (isValidWaveSelected)
+	{
+		// Get the x of the rectangle
+		int x = startPoint.X;
+		// Get the y of the rectangle
+		int y = Math::Min(startPoint.Y, currentPoint.Y);
+		// Get the height of the rectangle
+		int height = Math::Abs(currentPoint.Y - startPoint.Y);
+
+		// Declare a list to store the Fibonacci prices
+		List<double>^ fibonacciPrices = gcnew List<double>();
+
+		// Loop through the Fibonacci levels
+		for each (double level in fibonnaciLevels)
+		{
+			// Calculate the y position of the Fibonacci level
+			double levelY = y + level * height;
+			// Add the Fibonacci level price to the list
+			fibonacciPrices->Add(chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY->PixelPositionToValue(levelY));
+		}
+
+		// Calculate the margin for the confirmations
+		double margin = Math::Abs(
+			chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY->PixelPositionToValue(currentPoint.Y) -
+			chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY->PixelPositionToValue(startPoint.Y)
+		) * 0.015;
+
+		// Loop through the candlesticks in the selected wave
+		for (int i = startPointIdx; i <= endPointIdx; i++)
+		{
+			// Get the candlestick at the current index
+			auto candlestick = filteredCandlesticks[i];
+			// Declare an array to store the OHLC values
+			array<double>^ ohlc = gcnew array<double> {
+				(double)candlestick->open,
+					(double)candlestick->high,
+					(double)candlestick->low,
+					(double)candlestick->close
+			};
+
+			// Loop through the OHLC values
+			for each (double price in ohlc)
+			{
+				// Loop through the Fibonacci prices
+				for each (double fibonacciPrice in fibonacciPrices)
+				{
+					// Check if the price is within the margin of the Fibonacci price
+					if (price >= fibonacciPrice - margin && price <= fibonacciPrice + margin)
+					{
+						// Create a new EllipseAnnotation for the confirmation
+						EllipseAnnotation^ confirmationAnnotation = gcnew EllipseAnnotation();
+						// Set the axisX
+						confirmationAnnotation->AxisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
+						// Set the axisY
+						confirmationAnnotation->AxisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
+						// Set the anchor data point
+						confirmationAnnotation->AnchorDataPoint = chart_stockData->Series["Series_OHLC"]->Points[i];
+						// Set the Y position
+						confirmationAnnotation->Y = price;
+						// Set the width
+						confirmationAnnotation->Width = 0.6;
+						// Set the height
+						confirmationAnnotation->Height = 1.2;
+						// Set the background color
+						confirmationAnnotation->BackColor = Color::Yellow;
+						// Set the anchor alignment
+						confirmationAnnotation->AnchorAlignment = ContentAlignment::MiddleCenter;
+						// Add the confirmation annotation to the list
+						confirmationAnnotations->Add(confirmationAnnotation);
+						// Add the confirmation annotation to the chart
+						chart_stockData->Annotations->Add(confirmationAnnotation);
+					}
+				}
+			}
+		}
+	}
+}
+
 
 /// <summary>
 /// Function to handle the paint event of the chart
@@ -660,15 +734,6 @@ Void Form_AnalyzeStock::chart_stockData_Paint(Object^ sender, PaintEventArgs^ e)
 	// Check if the user is dragging the mouse or a valid wave is selected
 	if (isDragging || isValidWaveSelected)
 	{
-		// Loop through the confirmation annotations list
-		for each (EllipseAnnotation ^ annotation in confirmationAnnotations)
-		{
-			// Remove the existing confirmation annotations from the chart
-			chart_stockData->Annotations->Remove(annotation);
-		}
-		// Clear the confirmation annotations list
-		confirmationAnnotations->Clear();
-
 		// Get the graphics object from the event
 		Graphics^ g = e->Graphics;
 
@@ -680,9 +745,6 @@ Void Form_AnalyzeStock::chart_stockData_Paint(Object^ sender, PaintEventArgs^ e)
 		int width = Math::Abs(currentPoint.X - startPoint.X);
 		// Get the height of the rectangle
 		int height = Math::Abs(currentPoint.Y - startPoint.Y);
-
-		// Check if the enclosing rectangle is valid wave
-		bool isRectangleValidWave = isValidWave();
 
 		// Declare pen to draw the rectangle
 		Pen^ pen = gcnew Pen(Color::Red, 2);
@@ -706,24 +768,24 @@ Void Form_AnalyzeStock::chart_stockData_Paint(Object^ sender, PaintEventArgs^ e)
 		}
 		delete pen;
 
+		// Declare brush color based on selected wave
+		Color brushColor = !isValidWaveSelected ? Color::Yellow : (isSelectUpWave ? Color::Green : Color::Red);
 		// Declare brush to fill the rectangle
-		SolidBrush^ fillBrush = gcnew SolidBrush(Color::FromArgb(35, isRectangleValidWave ? Color::Green : Color::Red));
+		SolidBrush^ fillBrush = gcnew SolidBrush(Color::FromArgb(35, brushColor));
 		// Fill the rectangle on the chart
 		g->FillRectangle(fillBrush, x, y, width, height);
 		delete fillBrush;
 
 		// Check if the selected rectangle is a valid wave
-		if (isRectangleValidWave)
+		if (isValidWaveSelected)
 		{
 			// Check if the selected wave is a down wave
 			bool isDownWave = filteredCandlesticks[startPointIdx]->high > filteredCandlesticks[endPointIdx]->high;
-			// Declare an array of Fibonacci levels
-			array<double>^ fibonacciLevels = { 0.0, 0.236, 0.382, 0.5, 0.618, 0.764, 1.0 };
 			// Declare a list to store the Fibonacci prices
 			List<double>^ fibonacciPrices = gcnew List<double>();
 
 			// Loop through the Fibonacci levels
-			for each (double level in fibonacciLevels)
+			for each (double level in fibonnaciLevels)
 			{
 				// Calculate the y position of the Fibonacci level
 				int levelY = y + (int)(level * height);
@@ -735,7 +797,7 @@ Void Form_AnalyzeStock::chart_stockData_Paint(Object^ sender, PaintEventArgs^ e)
 				delete levelPen;
 
 				// Declare a font to draw the Fibonacci level text
-                System::Drawing::Font^ levelFont = gcnew System::Drawing::Font("Arial", 10, System::Drawing::FontStyle::Bold);
+				System::Drawing::Font^ levelFont = gcnew System::Drawing::Font("Arial", 10, System::Drawing::FontStyle::Bold);
 				// Add the Fibonacci level price to the list
 				double price = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY->PixelPositionToValue(levelY);
 				fibonacciPrices->Add(price);
@@ -746,58 +808,134 @@ Void Form_AnalyzeStock::chart_stockData_Paint(Object^ sender, PaintEventArgs^ e)
 				g->DrawString(label, levelFont, Brushes::Black, x + width + 5, levelY - 10);
 				delete levelFont;
 			}
-
-			// Calculate the margin for the confirmations
-			double margin = Math::Abs(
-				chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY->PixelPositionToValue(currentPoint.Y) -
-				chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY->PixelPositionToValue(startPoint.Y)
-			) * 0.015;
-
-			// Loop through the candlesticks in the selected wave
-			for (int i = startPointIdx; i <= endPointIdx; i++)
-			{
-				// Get the candlestick at the current index
-				auto candlestick = filteredCandlesticks[i];
-				// Declare a list to store the OHLC values
-				array<double>^ ohlc = gcnew array<double> { candlestick->open, candlestick->high, candlestick->low, candlestick->close };
-
-				// Loop through the OHLC values
-				for each (double price in ohlc)
-				{
-					// Loop through the Fibonacci prices
-					for each (double fibonacciPrice in fibonacciPrices)
-					{
-						// Check if the price is within the margin of the Fibonacci price
-						if (price >= fibonacciPrice - margin && price <= fibonacciPrice + margin)
-						{
-							// Create a new EllipseAnnotation for the confirmation
-							EllipseAnnotation^ confirmationAnnotation = gcnew EllipseAnnotation();
-							// Set the axisX
-							confirmationAnnotation->AxisX = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisX;
-							// Set the axisY
-							confirmationAnnotation->AxisY = chart_stockData->ChartAreas["ChartArea_OHLC"]->AxisY;
-							// Set the anchor data point
-							confirmationAnnotation->AnchorDataPoint = chart_stockData->Series["Series_OHLC"]->Points[i];
-							// Set the Y position
-							confirmationAnnotation->Y = price;
-							// Set the width
-							confirmationAnnotation->Width = 0.6;
-							// Set the height
-							confirmationAnnotation->Height = 1.2;
-							// Set the background color
-							confirmationAnnotation->BackColor = Color::Yellow;
-							// Set the anchor alignment
-							confirmationAnnotation->AnchorAlignment = ContentAlignment::MiddleCenter;
-							// Add the confirmation annotation to the list
-							confirmationAnnotations->Add(confirmationAnnotation);
-							// Add the confirmation annotation to the chart
-							chart_stockData->Annotations->Add(confirmationAnnotation);
-						}
-					}
-				}
-			}
 		}
 	}
 	// Set the label_confirmationsCount text to display the number of confirmations
 	label_confirmationsCount->Text = String::Format("Number of confirmations: {0}", confirmationAnnotations->Count);
 }
+
+/// <summary>
+/// Function to handle the click event of the button_simulate
+/// </summary>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
+Void Form_AnalyzeStock::button_simulate_Click(Object^ sender, EventArgs^ e)
+{
+	// Check if the simulation is not running
+	if (!isSimulating)
+	{
+		// Set the isSimulating to true
+		isSimulating = true;
+		// Set the button_simulate text to "Stop"
+		button_simulate->Text = "Stop";
+		// Move the current point down
+		currentPoint.Y += (int)(stepSize * (numberOfSteps / 2));
+		// Disable the button_plus
+		button_plus->Enabled = false;
+		// Disable the button_minus
+		button_minus->Enabled = false;
+		// Annotate the confirmations in the chart
+		annotateConfirmations();
+		// Invalidate the chart to refresh the display
+		chart_stockData->Invalidate();
+	}
+	// Check if the simulation is running
+	else
+	{
+		// Stop the simulation
+		stopSimulation();
+	}
+}
+
+/// <summary>
+/// Function to handle the click event of the button_plus
+/// </summary>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
+Void Form_AnalyzeStock::button_plus_Click(Object^ sender, EventArgs^ e)
+{
+	// Check if valid wave is selected
+	if (isValidWaveSelected)
+	{
+		// Move the current point up
+		currentPoint.Y = Math::Max((int)(currentPoint.Y - stepSize), 0);
+		// Annotate the confirmations in the chart
+		annotateConfirmations();
+		// Invalidate the chart to refresh the display
+		chart_stockData->Invalidate();
+	}
+}
+
+/// <summary>
+/// Function to handle the click event of the button_minus
+/// </summary>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
+Void Form_AnalyzeStock::button_minus_Click(Object^ sender, EventArgs^ e)
+{
+	// Check if valid wave is selected
+	if (isValidWaveSelected)
+	{
+		// Move the current point down
+		currentPoint.Y = (int)(currentPoint.Y + stepSize);
+		// Annotate the confirmations in the chart
+		annotateConfirmations();
+		// Invalidate the chart to refresh the display
+		chart_stockData->Invalidate();
+	}
+}
+
+/// <summary>
+/// Function to handle the tick event of the timer_simulate
+/// </summary>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
+Void Form_AnalyzeStock::timer_simulate_Tick(Object^ sender, EventArgs^ e)
+{
+	// Check if the simulation is running
+	if (isSimulating)
+	{
+		// Check if the current step is less than the number of steps
+		if (currentStep < numberOfSteps)
+		{
+			// Move the current point up
+			currentPoint.Y = Math::Max((int)(currentPoint.Y - stepSize), 0);
+			// Check if the current point Y is 0
+			if (currentPoint.Y == 0)
+			{
+				// Stop the simulation
+				stopSimulation();
+			}
+			// Increment the current step
+			currentStep++;
+			// Annotate the confirmations in the chart
+			annotateConfirmations();
+			// Invalidate the chart to refresh the display
+			chart_stockData->Invalidate();
+		}
+		// Else if the current step is greater than or equal to the number of steps
+		else
+		{
+			// Stop the simulation
+			stopSimulation();
+		}
+	}
+}
+
+/// <summary>
+/// Function to stop the simulation
+/// </summary>
+Void Form_AnalyzeStock::stopSimulation()
+{
+	// Stop the simulation
+	isSimulating = false;
+	// Set the button_simulate text to "Start"
+	button_simulate->Text = "Start";
+	// Enable the button_plus
+	button_plus->Enabled = true;
+	// Enable the button_minus
+	button_minus->Enabled = true;
+	// Reset the current step
+	currentStep = 0;
+}
+
