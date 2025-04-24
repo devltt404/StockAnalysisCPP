@@ -129,6 +129,10 @@ private: System::Windows::Forms::Button^ button_minus;
 private: System::Windows::Forms::Button^ button_plus;
 private: System::Windows::Forms::Button^ button_simulate;
 private: System::Windows::Forms::Timer^ timer_simulate;
+private: System::Windows::Forms::Label^ label_steps;
+private: System::Windows::Forms::TrackBar^ trackBar_steps;
+private: System::Windows::Forms::Label^ label_range;
+private: System::Windows::Forms::TrackBar^ trackBar_range;
 	   // Declare a variable to store the number of steps for the simulation
 	private: int numberOfSteps = 30;
 
@@ -303,6 +307,20 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 	/// Function to stop the simulation
 	/// </summary>
 	private: System::Void stopSimulation();
+
+	/// <summary>
+	/// Function to handle the scroll event of the trackBar_range
+	/// </summary>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
+	private: System::Void trackBar_range_Scroll(System::Object^ sender, System::EventArgs^ e);
+
+	/// <summary>
+	/// Function to handle the scroll event of the trackBar_steps
+	/// </summary>
+	/// <param name="sender">The control that triggered the event</param>
+	/// <param name="e">Event data</param>
+	private: System::Void trackBar_steps_Scroll(System::Object^ sender, System::EventArgs^ e);
 #pragma endregion
 
 #pragma region Windows Form Designer generated code
@@ -313,10 +331,10 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 		void InitializeComponent(void)
 		{
 			this->components = (gcnew System::ComponentModel::Container());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea7 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea8 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Series^ series7 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^ series8 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea2 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->button_loadTicker = (gcnew System::Windows::Forms::Button());
 			this->openFileDialog_loadTicker = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->label_endDate = (gcnew System::Windows::Forms::Label());
@@ -336,8 +354,14 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->button_plus = (gcnew System::Windows::Forms::Button());
 			this->button_simulate = (gcnew System::Windows::Forms::Button());
 			this->timer_simulate = (gcnew System::Windows::Forms::Timer(this->components));
+			this->label_steps = (gcnew System::Windows::Forms::Label());
+			this->trackBar_steps = (gcnew System::Windows::Forms::TrackBar());
+			this->label_range = (gcnew System::Windows::Forms::Label());
+			this->trackBar_range = (gcnew System::Windows::Forms::TrackBar());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart_stockData))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_peakValleyMargin))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_steps))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_range))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// button_loadTicker
@@ -346,10 +370,9 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->button_loadTicker->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->button_loadTicker->ForeColor = System::Drawing::Color::White;
-			this->button_loadTicker->Location = System::Drawing::Point(34, 14);
-			this->button_loadTicker->Margin = System::Windows::Forms::Padding(2);
+			this->button_loadTicker->Location = System::Drawing::Point(51, 22);
 			this->button_loadTicker->Name = L"button_loadTicker";
-			this->button_loadTicker->Size = System::Drawing::Size(135, 45);
+			this->button_loadTicker->Size = System::Drawing::Size(202, 69);
 			this->button_loadTicker->TabIndex = 0;
 			this->button_loadTicker->Text = L"Load Ticker";
 			this->button_loadTicker->UseVisualStyleBackColor = false;
@@ -370,10 +393,9 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->label_endDate->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label_endDate->ForeColor = System::Drawing::Color::Black;
-			this->label_endDate->Location = System::Drawing::Point(31, 111);
-			this->label_endDate->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label_endDate->Location = System::Drawing::Point(46, 171);
 			this->label_endDate->Name = L"label_endDate";
-			this->label_endDate->Size = System::Drawing::Size(58, 15);
+			this->label_endDate->Size = System::Drawing::Size(85, 22);
 			this->label_endDate->TabIndex = 8;
 			this->label_endDate->Text = L"End Date";
 			// 
@@ -383,59 +405,57 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->label_startDate->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label_startDate->ForeColor = System::Drawing::Color::Black;
-			this->label_startDate->Location = System::Drawing::Point(31, 79);
-			this->label_startDate->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label_startDate->Location = System::Drawing::Point(46, 122);
 			this->label_startDate->Name = L"label_startDate";
-			this->label_startDate->Size = System::Drawing::Size(61, 15);
+			this->label_startDate->Size = System::Drawing::Size(91, 22);
 			this->label_startDate->TabIndex = 7;
 			this->label_startDate->Text = L"Start Date";
 			// 
 			// dateTimePicker_endDate
 			// 
-			this->dateTimePicker_endDate->Location = System::Drawing::Point(96, 110);
-			this->dateTimePicker_endDate->Margin = System::Windows::Forms::Padding(2);
+			this->dateTimePicker_endDate->Location = System::Drawing::Point(144, 169);
 			this->dateTimePicker_endDate->Name = L"dateTimePicker_endDate";
-			this->dateTimePicker_endDate->Size = System::Drawing::Size(183, 20);
+			this->dateTimePicker_endDate->Size = System::Drawing::Size(272, 26);
 			this->dateTimePicker_endDate->TabIndex = 6;
 			this->dateTimePicker_endDate->Value = System::DateTime(2021, 2, 28, 0, 0, 0, 0);
 			// 
 			// dateTimePicker_startDate
 			// 
-			this->dateTimePicker_startDate->Location = System::Drawing::Point(96, 77);
-			this->dateTimePicker_startDate->Margin = System::Windows::Forms::Padding(2);
+			this->dateTimePicker_startDate->Location = System::Drawing::Point(144, 118);
 			this->dateTimePicker_startDate->Name = L"dateTimePicker_startDate";
-			this->dateTimePicker_startDate->Size = System::Drawing::Size(183, 20);
+			this->dateTimePicker_startDate->Size = System::Drawing::Size(272, 26);
 			this->dateTimePicker_startDate->TabIndex = 5;
 			this->dateTimePicker_startDate->Value = System::DateTime(2021, 2, 1, 0, 0, 0, 0);
 			// 
 			// chart_stockData
 			// 
-			chartArea7->AlignWithChartArea = L"ChartArea_Volume";
-			chartArea7->Name = L"ChartArea_OHLC";
-			chartArea8->Name = L"ChartArea_Volume";
-			this->chart_stockData->ChartAreas->Add(chartArea7);
-			this->chart_stockData->ChartAreas->Add(chartArea8);
-			this->chart_stockData->Location = System::Drawing::Point(29, 142);
+			chartArea1->AlignWithChartArea = L"ChartArea_Volume";
+			chartArea1->Name = L"ChartArea_OHLC";
+			chartArea2->Name = L"ChartArea_Volume";
+			this->chart_stockData->ChartAreas->Add(chartArea1);
+			this->chart_stockData->ChartAreas->Add(chartArea2);
+			this->chart_stockData->Location = System::Drawing::Point(44, 218);
+			this->chart_stockData->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
 			this->chart_stockData->Name = L"chart_stockData";
-			series7->ChartArea = L"ChartArea_OHLC";
-			series7->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Candlestick;
-			series7->CustomProperties = L"PriceDownColor=Red, PriceUpColor=Green";
-			series7->IsXValueIndexed = true;
-			series7->Name = L"Series_OHLC";
-			series7->XValueMember = L"Date";
-			series7->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
-			series7->YValueMembers = L"high,low,open,close";
-			series7->YValuesPerPoint = 4;
-			series8->ChartArea = L"ChartArea_Volume";
-			series8->IsXValueIndexed = true;
-			series8->Name = L"Series_Volume";
-			series8->XValueMember = L"Date";
-			series8->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
-			series8->YValueMembers = L"Volume";
-			series8->YValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::UInt64;
-			this->chart_stockData->Series->Add(series7);
-			this->chart_stockData->Series->Add(series8);
-			this->chart_stockData->Size = System::Drawing::Size(1017, 486);
+			series1->ChartArea = L"ChartArea_OHLC";
+			series1->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Candlestick;
+			series1->CustomProperties = L"PriceDownColor=Red, PriceUpColor=Green";
+			series1->IsXValueIndexed = true;
+			series1->Name = L"Series_OHLC";
+			series1->XValueMember = L"Date";
+			series1->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
+			series1->YValueMembers = L"high,low,open,close";
+			series1->YValuesPerPoint = 4;
+			series2->ChartArea = L"ChartArea_Volume";
+			series2->IsXValueIndexed = true;
+			series2->Name = L"Series_Volume";
+			series2->XValueMember = L"Date";
+			series2->XValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::Date;
+			series2->YValueMembers = L"Volume";
+			series2->YValueType = System::Windows::Forms::DataVisualization::Charting::ChartValueType::UInt64;
+			this->chart_stockData->Series->Add(series1);
+			this->chart_stockData->Series->Add(series2);
+			this->chart_stockData->Size = System::Drawing::Size(1526, 748);
 			this->chart_stockData->TabIndex = 10;
 			this->chart_stockData->Text = L"chart1";
 			this->chart_stockData->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Form_AnalyzeStock::chart_stockData_Paint);
@@ -446,40 +466,36 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			// comboBox_downWave
 			// 
 			this->comboBox_downWave->FormattingEnabled = true;
-			this->comboBox_downWave->Location = System::Drawing::Point(576, 92);
-			this->comboBox_downWave->Margin = System::Windows::Forms::Padding(2);
+			this->comboBox_downWave->Location = System::Drawing::Point(710, 142);
 			this->comboBox_downWave->Name = L"comboBox_downWave";
-			this->comboBox_downWave->Size = System::Drawing::Size(161, 21);
+			this->comboBox_downWave->Size = System::Drawing::Size(240, 28);
 			this->comboBox_downWave->TabIndex = 19;
 			this->comboBox_downWave->SelectedIndexChanged += gcnew System::EventHandler(this, &Form_AnalyzeStock::comboBox_downWave_SelectedIndexChanged);
 			// 
 			// label_downWave
 			// 
 			this->label_downWave->AutoSize = true;
-			this->label_downWave->Location = System::Drawing::Point(573, 69);
-			this->label_downWave->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label_downWave->Location = System::Drawing::Point(706, 106);
 			this->label_downWave->Name = L"label_downWave";
-			this->label_downWave->Size = System::Drawing::Size(74, 13);
+			this->label_downWave->Size = System::Drawing::Size(103, 20);
 			this->label_downWave->TabIndex = 18;
 			this->label_downWave->Text = L"DOWN Wave";
 			// 
 			// label_upWave
 			// 
 			this->label_upWave->AutoSize = true;
-			this->label_upWave->Location = System::Drawing::Point(573, 17);
-			this->label_upWave->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label_upWave->Location = System::Drawing::Point(706, 26);
 			this->label_upWave->Name = L"label_upWave";
-			this->label_upWave->Size = System::Drawing::Size(54, 13);
+			this->label_upWave->Size = System::Drawing::Size(75, 20);
 			this->label_upWave->TabIndex = 17;
 			this->label_upWave->Text = L"UP Wave";
 			// 
 			// comboBox_upWave
 			// 
 			this->comboBox_upWave->FormattingEnabled = true;
-			this->comboBox_upWave->Location = System::Drawing::Point(576, 38);
-			this->comboBox_upWave->Margin = System::Windows::Forms::Padding(2);
+			this->comboBox_upWave->Location = System::Drawing::Point(710, 58);
 			this->comboBox_upWave->Name = L"comboBox_upWave";
-			this->comboBox_upWave->Size = System::Drawing::Size(161, 21);
+			this->comboBox_upWave->Size = System::Drawing::Size(240, 28);
 			this->comboBox_upWave->TabIndex = 16;
 			this->comboBox_upWave->SelectedIndexChanged += gcnew System::EventHandler(this, &Form_AnalyzeStock::comboBox_upWave_SelectedIndexChanged);
 			// 
@@ -489,9 +505,10 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->button_refresh->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->button_refresh->ForeColor = System::Drawing::SystemColors::HighlightText;
-			this->button_refresh->Location = System::Drawing::Point(399, 17);
+			this->button_refresh->Location = System::Drawing::Point(444, 26);
+			this->button_refresh->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
 			this->button_refresh->Name = L"button_refresh";
-			this->button_refresh->Size = System::Drawing::Size(93, 39);
+			this->button_refresh->Size = System::Drawing::Size(140, 60);
 			this->button_refresh->TabIndex = 15;
 			this->button_refresh->Text = L"Refresh";
 			this->button_refresh->UseVisualStyleBackColor = false;
@@ -500,19 +517,21 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			// label_peakValleyMargin
 			// 
 			this->label_peakValleyMargin->AutoSize = true;
-			this->label_peakValleyMargin->Location = System::Drawing::Point(404, 69);
+			this->label_peakValleyMargin->Location = System::Drawing::Point(452, 106);
+			this->label_peakValleyMargin->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label_peakValleyMargin->Name = L"label_peakValleyMargin";
-			this->label_peakValleyMargin->Size = System::Drawing::Size(112, 13);
+			this->label_peakValleyMargin->Size = System::Drawing::Size(160, 20);
 			this->label_peakValleyMargin->TabIndex = 14;
 			this->label_peakValleyMargin->Text = L"Peak/Valley Margin: 1";
 			// 
 			// trackBar_peakValleyMargin
 			// 
-			this->trackBar_peakValleyMargin->Location = System::Drawing::Point(399, 92);
+			this->trackBar_peakValleyMargin->Location = System::Drawing::Point(444, 142);
+			this->trackBar_peakValleyMargin->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
 			this->trackBar_peakValleyMargin->Maximum = 4;
 			this->trackBar_peakValleyMargin->Minimum = 1;
 			this->trackBar_peakValleyMargin->Name = L"trackBar_peakValleyMargin";
-			this->trackBar_peakValleyMargin->Size = System::Drawing::Size(141, 45);
+			this->trackBar_peakValleyMargin->Size = System::Drawing::Size(212, 69);
 			this->trackBar_peakValleyMargin->TabIndex = 13;
 			this->trackBar_peakValleyMargin->Value = 1;
 			this->trackBar_peakValleyMargin->ValueChanged += gcnew System::EventHandler(this, &Form_AnalyzeStock::trackBar_peakValleyMargin_ValueChanged);
@@ -522,20 +541,18 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->label_confirmationsCount->AutoSize = true;
 			this->label_confirmationsCount->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Bold,
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
-			this->label_confirmationsCount->Location = System::Drawing::Point(856, 110);
-			this->label_confirmationsCount->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label_confirmationsCount->Location = System::Drawing::Point(1284, 169);
 			this->label_confirmationsCount->Name = L"label_confirmationsCount";
-			this->label_confirmationsCount->Size = System::Drawing::Size(190, 16);
+			this->label_confirmationsCount->Size = System::Drawing::Size(270, 25);
 			this->label_confirmationsCount->TabIndex = 20;
 			this->label_confirmationsCount->Text = L"Number of confirmations: 0";
 			// 
 			// button_minus
 			// 
 			this->button_minus->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14));
-			this->button_minus->Location = System::Drawing::Point(1011, 58);
-			this->button_minus->Margin = System::Windows::Forms::Padding(2);
+			this->button_minus->Location = System::Drawing::Point(1516, 89);
 			this->button_minus->Name = L"button_minus";
-			this->button_minus->Size = System::Drawing::Size(34, 34);
+			this->button_minus->Size = System::Drawing::Size(51, 52);
 			this->button_minus->TabIndex = 23;
 			this->button_minus->Text = L"-";
 			this->button_minus->UseVisualStyleBackColor = true;
@@ -544,10 +561,9 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			// button_plus
 			// 
 			this->button_plus->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14));
-			this->button_plus->Location = System::Drawing::Point(872, 58);
-			this->button_plus->Margin = System::Windows::Forms::Padding(2);
+			this->button_plus->Location = System::Drawing::Point(1308, 89);
 			this->button_plus->Name = L"button_plus";
-			this->button_plus->Size = System::Drawing::Size(34, 34);
+			this->button_plus->Size = System::Drawing::Size(51, 52);
 			this->button_plus->TabIndex = 22;
 			this->button_plus->Text = L"+";
 			this->button_plus->UseVisualStyleBackColor = true;
@@ -556,10 +572,9 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			// button_simulate
 			// 
 			this->button_simulate->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 10));
-			this->button_simulate->Location = System::Drawing::Point(918, 58);
-			this->button_simulate->Margin = System::Windows::Forms::Padding(2);
+			this->button_simulate->Location = System::Drawing::Point(1377, 89);
 			this->button_simulate->Name = L"button_simulate";
-			this->button_simulate->Size = System::Drawing::Size(80, 34);
+			this->button_simulate->Size = System::Drawing::Size(120, 52);
 			this->button_simulate->TabIndex = 21;
 			this->button_simulate->Text = L"Start";
 			this->button_simulate->UseVisualStyleBackColor = true;
@@ -567,15 +582,59 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			// 
 			// timer_simulate
 			// 
-			this->timer_simulate->Enabled = true;
 			this->timer_simulate->Interval = 1000;
 			this->timer_simulate->Tick += gcnew System::EventHandler(this, &Form_AnalyzeStock::timer_simulate_Tick);
 			// 
+			// label_steps
+			// 
+			this->label_steps->AutoSize = true;
+			this->label_steps->Location = System::Drawing::Point(1002, 99);
+			this->label_steps->Name = L"label_steps";
+			this->label_steps->Size = System::Drawing::Size(155, 20);
+			this->label_steps->TabIndex = 27;
+			this->label_steps->Text = L"Number of Steps: 30";
+			// 
+			// trackBar_steps
+			// 
+			this->trackBar_steps->Location = System::Drawing::Point(990, 128);
+			this->trackBar_steps->Maximum = 100;
+			this->trackBar_steps->Minimum = 2;
+			this->trackBar_steps->Name = L"trackBar_steps";
+			this->trackBar_steps->Size = System::Drawing::Size(242, 69);
+			this->trackBar_steps->TabIndex = 26;
+			this->trackBar_steps->TickFrequency = 2;
+			this->trackBar_steps->Value = 30;
+			this->trackBar_steps->Scroll += gcnew System::EventHandler(this, &Form_AnalyzeStock::trackBar_steps_Scroll);
+			// 
+			// label_range
+			// 
+			this->label_range->AutoSize = true;
+			this->label_range->Location = System::Drawing::Point(998, 12);
+			this->label_range->Name = L"label_range";
+			this->label_range->Size = System::Drawing::Size(160, 20);
+			this->label_range->TabIndex = 25;
+			this->label_range->Text = L"Percent of Range: 20";
+			// 
+			// trackBar_range
+			// 
+			this->trackBar_range->Location = System::Drawing::Point(990, 43);
+			this->trackBar_range->Maximum = 100;
+			this->trackBar_range->Minimum = 1;
+			this->trackBar_range->Name = L"trackBar_range";
+			this->trackBar_range->Size = System::Drawing::Size(242, 69);
+			this->trackBar_range->TabIndex = 24;
+			this->trackBar_range->Value = 20;
+			this->trackBar_range->Scroll += gcnew System::EventHandler(this, &Form_AnalyzeStock::trackBar_range_Scroll);
+			// 
 			// Form_AnalyzeStock
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			this->AutoScaleDimensions = System::Drawing::SizeF(9, 20);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1071, 641);
+			this->ClientSize = System::Drawing::Size(1606, 986);
+			this->Controls->Add(this->label_steps);
+			this->Controls->Add(this->trackBar_steps);
+			this->Controls->Add(this->label_range);
+			this->Controls->Add(this->trackBar_range);
 			this->Controls->Add(this->button_minus);
 			this->Controls->Add(this->button_plus);
 			this->Controls->Add(this->button_simulate);
@@ -593,12 +652,13 @@ private: System::Windows::Forms::Timer^ timer_simulate;
 			this->Controls->Add(this->dateTimePicker_endDate);
 			this->Controls->Add(this->dateTimePicker_startDate);
 			this->Controls->Add(this->button_loadTicker);
-			this->Margin = System::Windows::Forms::Padding(2);
 			this->Name = L"Form_AnalyzeStock";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::WindowsDefaultBounds;
 			this->Text = L"Form_AnalyzeStock";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart_stockData))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_peakValleyMargin))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_steps))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar_range))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 

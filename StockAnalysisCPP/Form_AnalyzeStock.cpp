@@ -486,7 +486,7 @@ Void Form_AnalyzeStock::handleSelectWave(Wave^ selectedWave)
 	isValidWaveSelected = true;
 
 	// Set the step size for the simulation
-	stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * 0.4 / numberOfSteps;
+	stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * (trackBar_range->Value / 100.0 * 2) / trackBar_steps->Value;
 	// Annotate the confirmations
 	annotateConfirmations();
 	// Refresh the chart
@@ -601,7 +601,7 @@ Void Form_AnalyzeStock::chart_stockData_MouseUp(Object^ sender, MouseEventArgs^ 
 	if (isValidWaveSelected)
 	{
 		// Set the step size for the simulation
-		stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * 0.4 / numberOfSteps;
+		stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * (trackBar_range->Value / 100.0 * 2) / trackBar_steps->Value;
 	}
 }
 
@@ -828,8 +828,12 @@ Void Form_AnalyzeStock::button_simulate_Click(Object^ sender, EventArgs^ e)
 		isSimulating = true;
 		// Set the button_simulate text to "Stop"
 		button_simulate->Text = "Stop";
+		// Set the stepSize
+		stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * (trackBar_range->Value / 100.0 * 2) / trackBar_steps->Value;
 		// Move the current point down
-		currentPoint.Y += (int)(stepSize * (numberOfSteps / 2));
+		currentPoint.Y += (int)(stepSize * (trackBar_steps->Value / 2));
+		// Start the timer
+		timer_simulate->Start();
 		// Disable the button_plus
 		button_plus->Enabled = false;
 		// Disable the button_minus
@@ -857,6 +861,8 @@ Void Form_AnalyzeStock::button_plus_Click(Object^ sender, EventArgs^ e)
 	// Check if valid wave is selected
 	if (isValidWaveSelected)
 	{
+		// Set the stepSize
+		stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * (trackBar_range->Value / 100.0 * 2) / trackBar_steps->Value;
 		// Move the current point up
 		currentPoint.Y = Math::Max((int)(currentPoint.Y - stepSize), 0);
 		// Annotate the confirmations in the chart
@@ -876,6 +882,8 @@ Void Form_AnalyzeStock::button_minus_Click(Object^ sender, EventArgs^ e)
 	// Check if valid wave is selected
 	if (isValidWaveSelected)
 	{
+		// Set the stepSize
+		stepSize = Math::Abs(currentPoint.Y - startPoint.Y) * (trackBar_range->Value / 100.0 * 2) / trackBar_steps->Value;
 		// Move the current point down
 		currentPoint.Y = (int)(currentPoint.Y + stepSize);
 		// Annotate the confirmations in the chart
@@ -896,7 +904,7 @@ Void Form_AnalyzeStock::timer_simulate_Tick(Object^ sender, EventArgs^ e)
 	if (isSimulating)
 	{
 		// Check if the current step is less than the number of steps
-		if (currentStep < numberOfSteps)
+		if (currentStep < trackBar_steps->Value)
 		{
 			// Move the current point up
 			currentPoint.Y = Math::Max((int)(currentPoint.Y - stepSize), 0);
@@ -929,6 +937,8 @@ Void Form_AnalyzeStock::stopSimulation()
 {
 	// Stop the simulation
 	isSimulating = false;
+	// Stop the timer
+	timer_simulate->Stop();
 	// Set the button_simulate text to "Start"
 	button_simulate->Text = "Start";
 	// Enable the button_plus
@@ -939,3 +949,24 @@ Void Form_AnalyzeStock::stopSimulation()
 	currentStep = 0;
 }
 
+/// <summary>
+/// Function to handle the scroll event of the trackBar_range
+/// </summary>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
+Void Form_AnalyzeStock::trackBar_range_Scroll(Object^ sender, EventArgs^ e)
+{
+	// Set the label_range text to display the current value of the range
+	label_range->Text = "Percent of Range: " + trackBar_range->Value;
+}
+
+/// <summary>
+/// Function to handle the scroll event of the trackBar_steps
+/// </summary>
+/// <param name="sender">The control that triggered the event</param>
+/// <param name="e">Event data</param>
+Void Form_AnalyzeStock::trackBar_steps_Scroll(Object^ sender, EventArgs^ e)
+{
+	// Set the label_steps text to display the current value of the steps
+	label_steps->Text = "Number of Steps: " + trackBar_steps->Value;
+}
